@@ -41,8 +41,15 @@
       position: relative;
     }
     .titlebar .brand {
+      display: flex; align-items: center; gap: 8px;
       font-size: 11.5px; letter-spacing: 0.22em;
       font-weight: 600; text-transform: uppercase;
+    }
+    .titlebar .brand img {
+      width: 18px; height: 18px;
+      filter: drop-shadow(0 0 4px rgba(201,166,255,0.25));
+    }
+    .titlebar .brand span {
       background: linear-gradient(90deg, var(--accent-3), var(--accent));
       -webkit-background-clip: text; background-clip: text;
       color: transparent;
@@ -195,7 +202,10 @@
 </head>
 <body>
   <div class="titlebar">
-    <div class="brand">Lilac</div>
+    <div class="brand">
+      <img src="build/icon.png" alt="">
+      <span>Lilac</span>
+    </div>
     <div class="tl">
       <button id="win_min" class="min" title="Minimize">
         <svg viewBox="0 0 10 10">

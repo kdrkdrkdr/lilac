@@ -194,5 +194,12 @@ samples/_*.wav
 # Local backups of scratch/build artefacts
 backup/
 
+# Electron icon resources are kept in VCS (overrides generic build/ rule)
+!electron/build/
+!electron/build/**
+
+# Release zips live local only
+release/
+
 # Large asset
 image.png

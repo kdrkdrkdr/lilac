@@ -22,6 +22,7 @@
     "asar": true,
     "win": {
       "target": "dir",
+      "icon": "build/icon.png",
       "artifactName": "${productName}-${version}-${arch}.${ext}"
     },
     "files": [
@@ -31,6 +32,7 @@
       "renderer.js",
       "lilac.js",
       "package.json",
+      "build/icon.png",
       "!**/node_modules/electron/**",
       "!**/node_modules/electron-builder/**"
     ],

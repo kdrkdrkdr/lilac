@@ -88,6 +88,7 @@ function createWindow() {
     maximizable: false,
     fullscreenable: false,
     frame: false,
+    icon: path.join(__dirname, 'build', 'icon.png'),
     backgroundColor: '#1e1b24',
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
