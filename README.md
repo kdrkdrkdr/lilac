@@ -1,52 +1,70 @@
 # Lilac
-Lilac is a ZeroShot VC Client software that uses AI to perform real-time voice conversion into a single voice file for more than 5 seconds without additional learning.
 
+Realtime zero-shot voice conversion. One short reference clip of the target
+voice (5 s+) is enough — no retraining. Runs on CPU with a hand-written C
+engine that streams through a HiFi-GAN generator and keeps RTF < 1 on modest
+hardware.
 
-# Lilac's Features
-- ### Run in a cpu environment
-    It can also be used in home PCs without GPUs.
+The desktop app is an Electron shell over `libvc.dll`.
 
-- ### No model training required
-    Only voice of more than 5 seconds is required for real-time conversion.
+- Python reference (`core.py`, `main.py`, `vc/`) — prototype kept for parity
+  tests.
+- C engine (`cpp/`) — production backend (OpenBLAS + RNNoise + miniaudio,
+  streaming decoder, pool-based parallel resblocks).
+- Electron UI (`electron/`) — device picker, meters, AGC, VAD gate.
 
+## Build — native engine
 
-# Pre-requisites
-- A Windows/Mac/Linux system with a minimum of 4GB RAM.
-- Anaconda installed.
-- PyTorch installed.
+Requires MSYS2 (`mingw-w64-x86_64-toolchain`, `mingw-w64-x86_64-gcc-fortran`)
+plus a prebuilt OpenBLAS dropped at `cpp/openblas/`.
 
-
-# Installation
-```
-conda create -n lilac python=3.9
-conda activate lilac
-git clone https://github.com/kdrkdrkdr/lilac.git
-pip install -r requirements.txt
-```
-
-# Run
-```
-python main.py
+```sh
+cd cpp
+mingw32-make libvc.dll
 ```
 
+Output `cpp/libvc.dll` has OpenBLAS, gfortran, and RNNoise statically linked,
+so nothing else needs to ship with it.
 
-# What's New!
-- v1.0.0
-    - new feature:
-        - Openvoice VC Code Optimization
-        - VAD with threshold
-    - bugfix:
-        - Mitigate sound breakage during chunk conversion
+You also need `cpp/weights.bin`. Export it from the Python checkpoint via
+`cpp/dump_weights.py`.
 
+## Run — Electron app (dev)
 
-# Future Plan
-Once the feature is stabilized, we will deploy it as Standalone.
+```sh
+cd electron
+npm install
+npm start
+```
 
+## Package
 
-# Disclaimer 
-We are not responsible for any direct, indirect, ripple, consequential or special damages caused by the use or unavailability of this Software.
+```sh
+cd electron
+npm run dist
+```
 
+Output lands in `electron/dist/win-unpacked/`:
 
-# Reference
-[myshell-ai/OpenVoice](https://github.com/myshell-ai/OpenVoice)  
-[w-okada/voice-changer](https://github.com/w-okada/voice-changer)
+```
+Lilac.exe
+libvc.dll
+weights.bin
+resources/
+```
+
+Zip the folder to distribute. All three top-level files must stay together.
+
+## Architecture
+
+- 48 kHz device I/O via miniaudio.
+- RNNoise denoise + VAD gate on the capture thread (10 ms frames).
+- AGC (target −20 dBFS default) between VAD and VC.
+- 48 ↔ 22.05 kHz resampling (stateful linear).
+- VC worker runs the streaming HiFi-GAN generator; per-hop output is
+  zeroed when the input hop was VAD-silenced (no bias-residue hum).
+- Two-thread pipeline (rnn + vc) connected by SPSC ring buffers.
+
+## Links
+
+Source: <https://github.com/kdrkdrkdr/lilac>
