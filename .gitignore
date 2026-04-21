@@ -155,8 +155,44 @@ dmypy.json
 cython_debug/
 
 # PyCharm
-#  JetBrains specific template is maintained in a separate JetBrains.gitignore that can
-#  be found at https://github.com/github/gitignore/blob/main/Global/JetBrains.gitignore
-#  and can be added to the global gitignore or merged into this file.  For a more nuclear
-#  option (not recommended) you can uncomment the following to ignore the entire idea folder.
 #.idea/
+
+# ─────── Lilac ───────
+
+# Native build artefacts
+cpp/*.o
+cpp/*.obj
+cpp/*.exe
+cpp/*.dll
+cpp/*.a
+cpp/*.lib
+cpp/build/
+cpp/lilac.log
+
+# Weights (download separately; large binary)
+cpp/weights.bin
+cpp/ref/
+
+# Vendored prebuilt OpenBLAS tree (system-dependent)
+cpp/openblas/
+
+# RNNoise prebuilt data that the user must supply/regenerate
+!cpp/rnnoise/
+
+# Electron build output and deps
+electron/node_modules/
+electron/dist/
+electron/out/
+
+# Working/scratch sample recordings
+samples/_*.wav
+
+# VSCode / Claude agent settings
+.vscode/
+.claude/
+
+# Local backups of scratch/build artefacts
+backup/
+
+# Large asset
+image.png
