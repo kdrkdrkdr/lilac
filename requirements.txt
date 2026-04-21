@@ -1,6 +1,0 @@
-# torch
-# torchaudio
-soundfile
-sounddevice
-PySide6
-numpy
