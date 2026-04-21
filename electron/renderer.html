@@ -1,0 +1,274 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Lilac</title>
+  <style>
+    :root {
+      --bg:         #1e1b24;
+      --bg-2:       #26232e;
+      --panel:      #2a2633;
+      --divider:    #35303f;
+      --text:       #ece9f4;
+      --text-dim:   #a49cb8;
+      --text-faint: #6f6882;
+      --accent:     #c9a6ff;
+      --accent-2:   #b38cff;
+      --accent-3:   #8f5dff;
+      --danger:     #e5657a;
+      --tl-close:   #ff6058;
+      --tl-min:     #ffbd2e;
+      --tl-dead:    #4a4556;
+    }
+
+    * { box-sizing: border-box; }
+    html, body {
+      margin: 0; padding: 0;
+      background: var(--bg); color: var(--text);
+      font: 13px/1.5 -apple-system, "SF Pro Text", "Segoe UI Variable",
+            "Segoe UI", system-ui, sans-serif;
+      height: 100%; width: 100%; overflow: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ─────── title bar (mac-style dots on the right) ─────── */
+    .titlebar {
+      height: 38px; width: 100%;
+      display: flex; align-items: center;
+      padding: 0 14px;
+      background: transparent;
+      user-select: none; -webkit-app-region: drag;
+      position: relative;
+    }
+    .titlebar .brand {
+      font-size: 11.5px; letter-spacing: 0.22em;
+      font-weight: 600; text-transform: uppercase;
+      background: linear-gradient(90deg, var(--accent-3), var(--accent));
+      -webkit-background-clip: text; background-clip: text;
+      color: transparent;
+    }
+    .tl {
+      margin-left: auto;
+      display: flex; gap: 8px; -webkit-app-region: no-drag;
+    }
+    .tl button {
+      width: 14px; height: 14px; border-radius: 50%;
+      border: 0; padding: 0; cursor: pointer;
+      position: relative;
+      display: inline-flex; align-items: center; justify-content: center;
+    }
+    .tl button svg {
+      width: 9px; height: 9px;
+      opacity: 0.85;
+    }
+    .tl .close { background: var(--tl-close); }
+    .tl .min   { background: var(--tl-min); }
+    .tl .dead  { background: var(--tl-dead); cursor: default; }
+    .tl .dead svg { opacity: 0; }
+
+    /* ─────── layout (flat, no cards) ─────── */
+    .app {
+      height: calc(100% - 38px); width: 100%;
+      overflow-y: auto;
+      padding: 2px 22px 14px;
+    }
+
+    .section {
+      padding: 12px 0;
+    }
+    .section + .section {
+      border-top: 1px solid var(--divider);
+    }
+    .section h3 {
+      margin: 0 0 10px; font-size: 10px; font-weight: 600;
+      color: var(--text-faint); letter-spacing: 0.18em;
+      text-transform: uppercase;
+    }
+
+    .row { display: flex; align-items: center; gap: 12px; }
+    .row + .row { margin-top: 10px; }
+    .grow { flex: 1; min-width: 0; }
+
+    /* ─────── form controls ─────── */
+    select, input[type="text"] {
+      background: var(--bg-2); color: var(--text);
+      border: 1px solid transparent; border-radius: 7px;
+      padding: 8px 11px; font-size: 12.5px; font-family: inherit;
+      width: 100%;
+      transition: border-color 120ms, background 120ms;
+    }
+    select:hover, input:hover { background: var(--panel); }
+    select:focus, input:focus { outline: none; border-color: var(--accent-3); }
+
+    button {
+      background: var(--bg-2); color: var(--text);
+      border: 1px solid transparent; border-radius: 7px;
+      padding: 8px 12px; font-size: 12.5px; font-family: inherit;
+      cursor: pointer; transition: background 120ms, border-color 120ms;
+    }
+    button:hover:not(:disabled) { background: var(--panel); }
+    button.primary {
+      background: linear-gradient(135deg, var(--accent-2), var(--accent-3));
+      border-color: transparent; color: #fff; font-weight: 500;
+      box-shadow: 0 1px 0 rgba(255,255,255,0.07) inset;
+    }
+    button.primary:hover:not(:disabled) { filter: brightness(1.08); }
+    button:disabled { opacity: 0.32; cursor: not-allowed; }
+
+    .iconbtn {
+      width: 34px; padding: 0; display: inline-flex; align-items: center;
+      justify-content: center; color: var(--text-dim);
+    }
+
+    label.lbl {
+      color: var(--text-dim); font-size: 11.5px; min-width: 56px;
+      letter-spacing: 0.02em;
+    }
+
+    /* ─────── slider ─────── */
+    input[type="range"] {
+      flex: 1; appearance: none; height: 4px; border-radius: 2px;
+      background: var(--divider); outline: none; cursor: pointer;
+    }
+    input[type="range"]::-webkit-slider-thumb {
+      appearance: none; width: 14px; height: 14px;
+      background: var(--accent); border: 2px solid var(--bg);
+      border-radius: 50%; cursor: pointer;
+      box-shadow: 0 0 0 1px rgba(201,166,255,0.25);
+    }
+    .value {
+      color: var(--text); font-variant-numeric: tabular-nums;
+      min-width: 56px; text-align: right; font-size: 12px;
+    }
+
+    /* ─────── meters ─────── */
+    .meter-row { display: flex; align-items: center; gap: 12px; }
+    .meter-row > .lbl { min-width: 40px; }
+    .meter {
+      flex: 1; height: 6px; background: var(--bg-2); border-radius: 3px;
+      overflow: hidden; position: relative;
+    }
+    .meter > div {
+      height: 100%; width: 0%;
+      background: linear-gradient(90deg, #6fd3a7, var(--accent), var(--danger));
+      transition: width 60ms linear;
+    }
+    .vad-bar {
+      flex: 1; height: 4px; background: var(--bg-2);
+      border-radius: 2px; overflow: hidden;
+    }
+    .vad-bar > div {
+      height: 100%; background: var(--accent-2); width: 0%;
+      transition: width 80ms linear;
+    }
+
+    .stat {
+      font-family: "SF Mono", "Cascadia Mono", Consolas, monospace;
+      font-size: 10.5px; color: var(--text-faint); padding-top: 8px;
+    }
+    .log {
+      color: var(--text-dim); font-size: 11px;
+      padding: 2px 0 8px; min-height: 1em;
+    }
+
+    /* ─────── file row ─────── */
+    .file-row { display: flex; gap: 8px; align-items: center; }
+
+    /* ─────── footer ─────── */
+    .footer {
+      display: flex; gap: 10px; padding-top: 10px;
+    }
+    .footer button { flex: 1; padding: 10px; font-size: 13px; font-weight: 500; }
+
+    /* ─────── github link ─────── */
+    .repo {
+      text-align: center; padding: 10px 0 0;
+      font-size: 10.5px; color: var(--text-faint);
+      letter-spacing: 0.04em;
+    }
+    .repo a {
+      color: var(--text-faint); text-decoration: none;
+      transition: color 120ms;
+    }
+    .repo a:hover { color: var(--accent); }
+  </style>
+</head>
+<body>
+  <div class="titlebar">
+    <div class="brand">Lilac</div>
+    <div class="tl">
+      <button id="win_min" class="min" title="Minimize">
+        <svg viewBox="0 0 10 10">
+          <path d="M2 5h6" stroke="#5a4300" stroke-width="1.6" stroke-linecap="round"/>
+        </svg>
+      </button>
+      <button class="dead" title="Fixed size" tabindex="-1">
+        <svg viewBox="0 0 10 10"></svg>
+      </button>
+      <button id="win_close" class="close" title="Close">
+        <svg viewBox="0 0 10 10">
+          <path d="M3 3l4 4M7 3l-4 4" stroke="#4a0007" stroke-width="1.6" stroke-linecap="round"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <div class="app">
+
+    <div class="section">
+      <h3>Target voice</h3>
+      <div class="file-row">
+        <input id="target" type="text" value="" readonly placeholder="Choose a reference WAV…">
+        <button id="pick_t" class="iconbtn" title="Choose WAV…">
+          <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4">
+            <path d="M2 4h4l1.5 1.5H14v7.5a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V4z"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <div class="section">
+      <h3>Devices</h3>
+      <div class="row"><label class="lbl">Input</label>  <select id="dev_in" class="grow"></select></div>
+      <div class="row"><label class="lbl">Output</label> <select id="dev_out" class="grow"></select></div>
+    </div>
+
+    <div class="section">
+      <h3>Processing</h3>
+      <div class="row">
+        <label class="lbl">Gain</label>
+        <input id="agc_db" type="range" min="-40" max="0" step="1" value="-20">
+        <span class="value"><span id="agc_db_val">-20</span> dB</span>
+      </div>
+      <div class="row">
+        <label class="lbl">VAD</label>
+        <div class="vad-bar"><div id="vad_bar"></div></div>
+        <span class="value" id="vad_val">0.00</span>
+      </div>
+    </div>
+
+    <div class="section">
+      <h3>Audio</h3>
+      <div class="meter-row"><span class="lbl">In</span>
+        <div class="meter"><div id="bar_in"></div></div></div>
+      <div class="meter-row" style="margin-top:10px"><span class="lbl">Out</span>
+        <div class="meter"><div id="bar_out"></div></div></div>
+      <div class="stat" id="stat_line">—</div>
+    </div>
+
+    <div class="log" id="log"></div>
+
+    <div class="footer">
+      <button id="start" class="primary" disabled>Start</button>
+      <button id="stop" disabled>Stop</button>
+    </div>
+
+    <div class="repo">
+      <a id="repo_link" href="#">github.com/kdrkdrkdr/lilac</a>
+    </div>
+
+  </div>
+
+  <script src="renderer.js"></script>
+</body>
+</html>

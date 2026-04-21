@@ -1,0 +1,52 @@
+{
+  "name": "lilac",
+  "version": "0.1.0",
+  "description": "Realtime voice conversion with a native C engine",
+  "main": "main.js",
+  "repository": "https://github.com/kdrkdrkdr/lilac",
+  "license": "MIT",
+  "scripts": {
+    "start": "electron .",
+    "dist": "electron-builder --win dir"
+  },
+  "devDependencies": {
+    "electron": "^41.2.1",
+    "electron-builder": "^25.1.8"
+  },
+  "dependencies": {
+    "koffi": "^2.9.0"
+  },
+  "build": {
+    "appId": "com.lilac.vc",
+    "productName": "Lilac",
+    "asar": true,
+    "win": {
+      "target": "dir",
+      "artifactName": "${productName}-${version}-${arch}.${ext}"
+    },
+    "files": [
+      "main.js",
+      "preload.js",
+      "renderer.html",
+      "renderer.js",
+      "lilac.js",
+      "package.json",
+      "!**/node_modules/electron/**",
+      "!**/node_modules/electron-builder/**"
+    ],
+    "extraFiles": [
+      {
+        "from": "../cpp/libvc.dll",
+        "to": "libvc.dll"
+      },
+      {
+        "from": "../cpp/weights.bin",
+        "to": "weights.bin"
+      },
+      {
+        "from": "../samples/tsu_10s.wav",
+        "to": "tsu_10s.wav"
+      }
+    ]
+  }
+}
